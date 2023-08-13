@@ -1,0 +1,79 @@
+import sqlite3 as sq
+import datetim
+con=sq.connect("contactmanagement.db")
+cur=con.cursor()
+cur.execute(""""create table if not exists contact
+                  (cid int primary kry,
+		   fname text,
+		   lname text,
+		    contact number,
+		    email text,
+   		    city text,
+                     check(email like '%_@_%._%'))
+                    );""")
+
+cur.execute(""""create table if not exists detail_log
+                  (
+		   fname text,
+		   lname text,
+		    newcontact number,
+                    oldcontact number,
+		    datetime text,
+   		    operation text,
+
+                    );""")
+
+cur.execute(""""create trigger if not exists insertdata
+                after insert on contact
+                begin
+                  insert into detail_log
+                   values(new.fname,new.lname,new.contact,'null',datetime('now'),'insert');
+                end;
+                 """)
+
+cur.execute(""""create trigger if not exists insertdata
+                after delete on contact
+                begin
+                  insert into detail_log
+                   values(old.fname,old.lname,old.contact,'null',datetime('now'),'delete');
+                end;
+                 """)
+
+cur.execute(""""create trigger if not exists insertdata
+                after update on contact
+                begin
+                  insert into detail_log
+                   values(new.fname,new.lname,new.contact,old.contact,datetime('now'),'update');
+                end;
+                 """)
+
+def updaterecord(cd):
+                 newcon=int(input("enter new contact number:"))
+                 cur.execute(f"update contact set contact={newcon}where cid={cd};")
+
+
+def deleterecord(cd):
+                 cur.execute(f"delete from contact where cid={cd}")
+
+
+def searchrecord(cd):
+                 cur.execute(f"select * from contact where cid={cd}")
+                 row=cur.fetchall()
+                 print(row)
+
+cur.execute("""insert into contact values
+                (1,'shivani','gamit',7643876567,'shivani67@gmail.com','surat'),
+                 (2,'preet','prajapati',9876545678,'preet34@gmail.com','bardoli'),
+                 (3,'pankaj','patel',6787654323,'pankaj76@gmail.com','vyara'),
+                  (4,'rutvik','patel',9878765456,'rutvik54@gmail.com','songadh'),
+                  (5,'suraj','chahan',9809676587,'saraj56@gmail.com','kamrej'); """)
+
+cur.execute("select * from contact")
+row=cur.fetchall()
+for i in row:
+   print(f"\nID:{i[0]}\nfname:{i[1]}\nlname:{i[2]}\ncontact{i[3]}\nemail:{i[4]}\ncity:{i[5]}")
+
+cur.execute("select * from contact")
+row=cur.fetchall()
+for i in row1:
+   print(f"fname:{i[0]}\nlname:{i[1]}\nnew-contact{i[2]}\nold-contact{i[3]}\ndatwteime:{i[4]}\noper")
